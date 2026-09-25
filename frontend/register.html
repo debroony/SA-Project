@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สมัครสมาชิก - ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</title>
+    <style>
+        :root {
+            --primary-color: #5c4033;
+            --accent-color: #f7e7ce;  
+            --text-color: #333;
+            --bg-color: #fafafa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 2rem 0; /* เพิ่ม padding บนล่างเผื่อหน้าจอมือถือเล็ก จะได้เลื่อนได้ไม่ติดขอบ */
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .auth-container {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(92, 64, 51, 0.2);
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: #4a3329;
+        }
+
+        .toggle-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .toggle-link span {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .toggle-link:hover span {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h1>สมัครสมาชิกใหม่</h1>
+        <p class="subtitle">เข้าร่วมเป็นส่วนหนึ่งของร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</p>
+
+        <!-- ฟอร์มสมัครสมาชิก -->
+        <form action="#" method="POST">
+            <div class="form-group">
+                <label for="fullname">ชื่อ-นามสกุล</label>
+                <input type="text" id="fullname" name="fullname" placeholder="กรอกชื่อ-นามสกุล" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">เบอร์โทรศัพท์</label>
+                <input type="tel" id="phone" name="phone" placeholder="0xx-xxxxxxx" pattern="[0-9]{3}-[0-9]{7}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">ชื่อผู้ใช้งาน (Username)</label>
+                <input type="text" id="username" name="username" placeholder="ตั้งชื่อผู้ใช้งาน" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">รหัสผ่าน</label>
+                <input type="password" id="password" name="password" placeholder="ตั้งรหัสผ่าน" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">ยืนยันรหัสผ่าน</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="กรอกรหัสผ่านอีกครั้ง" required>
+            </div>
+
+            <button type="submit" class="submit-btn">ยืนยันการสมัคร</button>
+        </form>
+
+        <!-- ลิงก์กลับไปหน้าเข้าสู่ระบบ -->
+        <a href="login.html" class="toggle-link">มีบัญชีอยู่แล้วใช่ไหม? <span>เข้าสู่ระบบที่นี่</span></a>
+    </div>
+
+</body>
+</html>
