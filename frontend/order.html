@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สั่งพรีออเดอร์ - ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</title>
+    <style>
+        :root {
+            --primary-color: #5c4033;
+            --accent-color: #f7e7ce;  
+            --text-color: #333;
+            --bg-color: #fafafa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .navbar-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .main-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .order-form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .form-group input[type="date"],
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer; 
+            background-color: white;
+        }
+
+        .form-group input[type="date"]:focus,
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(92, 64, 51, 0.2);
+        }
+
+        .menu-list {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .menu-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .menu-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-name {
+            color: var(--text-color);
+        }
+
+        .menu-price {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .menu-item input[type="number"] {
+            width: 70px;
+            padding: 0.4rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #4a3329;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .flatpickr-calendar { font-family: 'Segoe UI', sans-serif; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</a>
+        <div class="navbar-links">
+            <a href="order.html">สั่งขนม</a>
+            <a href="status.html">เช็คสถานะออเดอร์</a>
+            <a href="login.html">ออกจากระบบ</a>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <h1>พรีออเดอร์ขนมล่วงหน้า</h1>
+
+        <form class="order-form" action="status.html">
+            <div class="form-group">
+                <label for="receiveDate">วันที่ต้องการรับสินค้า:</label>
+                <input type="text" id="receiveDate" name="receiveDate" placeholder="คลิกเพื่อเลือกวันที่" required>
+            </div>
+
+            <div class="menu-list">
+                <div class="menu-title">รายการสินค้าและราคา</div>
+                
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">บลูเบอร์รี่ชีสเค้ก</span>
+                        <span class="menu-price">ราคา 85 บาท/ชิ้น</span>
+                    </div>
+                    <input type="number" id="qty_blueberry" name="qty_blueberry" min="0" value="0" required>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">ครัวซองต์เนยสด</span>
+                        <span class="menu-price">ราคา 65 บาท/ชิ้น</span>
+                    </div>
+                    <input type="number" id="qty_croissant" name="qty_croissant" min="0" value="0" required>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">ช็อกโกแลตลาวาเค้ก</span>
+                        <span class="menu-price">ราคา 90 บาท/ชิ้น</span>
+                    </div>
+                    <input type="number" id="qty_lava" name="qty_lava" min="0" value="0" required>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">ขนมปังโชกุปัง</span>
+                        <span class="menu-price">ราคา 120 บาท/ชิ้น</span>
+                    </div>
+                    <input type="number" id="qty_shokupan" name="qty_shokupan" min="0" value="0" required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">ยืนยันคำสั่งซื้อ</button>
+        </form>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr("#receiveDate", {
+            dateFormat: "d-m-Y", // บังคับฟอร์แมตเป็น DD-MM-YYYY
+            minDate: new Date().fp_incr(1), // บังคับเลือกได้เฉพาะวันพรุ่งนี้เป็นต้นไป (ล่วงหน้า 1 วัน)
+            maxDate: new Date().fp_incr(7), // บังคับเลือกได้สูงสุดไม่เกิน 7 วัน
+        });
+    </script>
+
+</body>
+</html>
