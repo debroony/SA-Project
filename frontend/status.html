@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สถานะออเดอร์ - ร้านเบเกอรี่เบลอๆ</title>
+    <style>
+        :root {
+            --primary-color: #5c4033;
+            --accent-color: #f7e7ce;  
+            --text-color: #333;
+            --bg-color: #fafafa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .navbar-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Table Styling */
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            padding: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #fcf9f5;
+        }
+
+        /* Status Badges ตาม Flowchart */
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        /* 1. รอผลิต (เหลือง) */
+        .badge-wait-prod {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        /* 2. กำลังผลิต (ฟ้า) */
+        .badge-in-prod {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        /* 3. รอตรวจสอบ (ม่วง) */
+        .badge-wait-inspect {
+            background-color: #e2d9f3;
+            color: #5a32a3;
+        }
+
+        /* 4. พร้อมส่ง (เขียว) */
+        .badge-ready {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">ร้านเบเกอรี่เบลอๆ</a>
+        <div class="navbar-links">
+            <a href="order.html">สั่งขนม</a>
+            <a href="status.html">เช็คสถานะออเดอร์</a>
+            <a href="index.html">ออกจากระบบ</a>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <h1>ประวัติการสั่งซื้อและสถานะ</h1>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>รหัสออเดอร์</th>
+                        <th>วันที่รับสินค้า</th>
+                        <th>รายการ (จำนวนรวม)</th>
+                        <th>ยอดรวม (บาท)</th>
+                        <th>สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#ORD-0004</td>
+                        <td>03-10-2026</td>
+                        <td>ขนมปังโชกุปัง (2)</td>
+                        <td>240</td>
+                        <td><span class="badge badge-wait-prod">รอผลิต</span></td>
+                    </tr>
+                    <tr>
+                        <td>#ORD-0003</td>
+                        <td>02-10-2026</td>
+                        <td>บลูเบอร์รี่ชีสเค้ก (3), ครัวซองต์ (2)</td>
+                        <td>385</td>
+                        <td><span class="badge badge-in-prod">กำลังผลิต</span></td>
+                    </tr>
+                    <tr>
+                        <td>#ORD-0002</td>
+                        <td>01-10-2026</td>
+                        <td>ช็อกโกแลตลาวาเค้ก (1)</td>
+                        <td>90</td>
+                        <td><span class="badge badge-wait-inspect">รอตรวจสอบ</span></td>
+                    </tr>
+                    <tr>
+                        <td>#ORD-0001</td>
+                        <td>28-09-2026</td>
+                        <td>ครัวซองต์เนยสด (5)</td>
+                        <td>325</td>
+                        <td><span class="badge badge-ready">พร้อมส่ง</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</body>
+</html>

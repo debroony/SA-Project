@@ -88,6 +88,21 @@
             background-color: var(--accent-color);
             color: var(--primary-color);
         }
+
+        /* ลิงก์สำหรับ Admin */
+        .admin-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .admin-link:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -97,12 +112,12 @@
         <p class="subtitle">ระบบสั่งจองขนมล่วงหน้า (Pre-order System)</p>
 
         <div class="button-group">
-            <!-- ลิงก์ไปหน้า login.html ที่เพิ่งทำไป -->
             <a href="login.html" class="btn btn-primary">เข้าสู่ระบบ</a>
-            
-            <!-- ลิงก์ไปหน้า register.html (รอพูทำต่อ) -->
             <a href="register.html" class="btn btn-outline">สมัครสมาชิกใหม่</a>
         </div>
+
+        <!-- ลิงก์ไปหน้า login ของ Admin -->
+        <a href="admin_login.html" class="admin-link">สำหรับผู้ดูแลร้าน (Admin Login)</a>
     </div>
 
 </body>

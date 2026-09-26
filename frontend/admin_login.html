@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</title>
+    <style>
+        :root {
+            --primary-color: #5c4033; /* สีน้ำตาลช็อกโกแลต */
+            --accent-color: #f7e7ce;  
+            --text-color: #333;
+            --bg-color: #fafafa;
+            --admin-color: #3a2820; /* สีน้ำตาลที่เข้มขึ้นสำหรับ Admin */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .auth-container {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12); /* เงาจะเข้มกว่าหน้าปกติเพื่อความต่าง */
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border-top: 5px solid var(--admin-color); /* แถบสีด้านบนแยกให้รู้ว่าเป็นส่วนของ Admin */
+        }
+
+        h1 {
+            color: var(--admin-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        p.subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--admin-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--admin-color);
+            box-shadow: 0 0 0 2px rgba(58, 40, 32, 0.2);
+        }
+
+        .submit-btn {
+            background-color: var(--admin-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: #241813;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h1>ส่วนจัดการร้านค้า</h1>
+        <p class="subtitle">ระบบหลังบ้าน (Back-office)</p>
+
+        <!-- ฟอร์มเข้าสู่ระบบของ Admin -->
+        <form action="#" method="POST">
+            <div class="form-group">
+                <label for="admin_username">รหัสผู้ดูแลระบบ (Admin ID)</label>
+                <input type="text" id="admin_username" name="admin_username" placeholder="กรอกรหัสผู้ดูแลระบบ" required>
+            </div>
+
+            <div class="form-group">
+                <label for="admin_password">รหัสผ่าน</label>
+                <input type="password" id="admin_password" name="admin_password" placeholder="กรอกรหัสผ่าน" required>
+            </div>
+
+            <button type="submit" class="submit-btn">เข้าสู่ระบบหลังบ้าน</button>
+        </form>
+
+        <!-- ลิงก์กลับไปหน้าหลัก -->
+        <a href="index.html" class="back-link">&larr; กลับไปหน้าร้านค้าปกติ</a>
+    </div>
+
+</body>
+</html>

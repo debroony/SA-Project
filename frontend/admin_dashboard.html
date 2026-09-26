@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการออเดอร์ (Admin) - ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</title>
+    <style>
+        :root {
+            --primary-color: #5c4033;
+            --accent-color: #f7e7ce;  
+            --text-color: #333;
+            --bg-color: #f4f6f9;
+            --admin-color: #3a2820; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Navbar Admin */
+        .navbar {
+            background-color: var(--admin-color);
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .navbar-links a {
+            text-decoration: none;
+            color: #ddd;
+            font-weight: 500;
+            margin-left: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .navbar-links a:hover {
+            color: white;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-summary {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            flex: 1;
+            border-left: 5px solid var(--admin-color);
+        }
+
+        .summary-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--admin-color);
+        }
+
+        /* Table Styling */
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            padding: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: var(--admin-color);
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #fdfdfd;
+        }
+
+        /* Status Select (Dropdown for Admin) */
+        select.status-dropdown {
+            padding: 0.4rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-update {
+            background-color: var(--admin-color);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+        }
+
+        .btn-update:hover {
+            background-color: #241813;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="navbar-logo">Bakery Admin Panel</a>
+        <div class="navbar-links">
+            <a href="#">แดชบอร์ด</a>
+            <a href="index.html">ออกจากระบบ</a>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <h2>ภาพรวมประจำวัน (<span id="currentDate"></span>)</h2>
+
+        <div class="dashboard-summary">
+            <div class="summary-card">
+                <div class="summary-title">ออเดอร์ทั้งหมดวันนี้</div>
+                <div class="summary-value">4 รายการ</div>
+            </div>
+            <div class="summary-card" style="border-left-color: #e67e22;">
+                <div class="summary-title">ยอดรวมขนมที่สั่ง (โควต้า 999 ชิ้น)</div>
+                <div class="summary-value">13 / 999 ชิ้น</div>
+            </div>
+            <div class="summary-card" style="border-left-color: #27ae60;">
+                <div class="summary-title">รายได้ประเมิน</div>
+                <div class="summary-value">1,040 บาท</div>
+            </div>
+        </div>
+
+        <h2>รายการสั่งพรีออเดอร์ลูกค้า</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>รหัสออเดอร์</th>
+                        <th>ชื่อลูกค้า</th>
+                        <th>รายการขนม</th>
+                        <th>อัปเดตสถานะล่าสุด</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#ORD-0004</td>
+                        <td>คุณสมชาย</td>
+                        <td>โชกุปัง (2)</td>
+                        <td>
+                            <select class="status-dropdown">
+                                <option value="wait-prod" selected>รอผลิต</option>
+                                <option value="in-prod">กำลังผลิต</option>
+                                <option value="wait-inspect">รอตรวจสอบ</option>
+                                <option value="ready">พร้อมส่ง</option>
+                            </select>
+                        </td>
+                        <td><button class="btn-update">บันทึก</button></td>
+                    </tr>
+                    <tr>
+                        <td>#ORD-0003</td>
+                        <td>คุณสมหญิง</td>
+                        <td>ชีสเค้ก (3), ครัวซองต์ (2)</td>
+                        <td>
+                            <select class="status-dropdown">
+                                <option value="wait-prod">รอผลิต</option>
+                                <option value="in-prod" selected>กำลังผลิต</option>
+                                <option value="wait-inspect">รอตรวจสอบ</option>
+                                <option value="ready">พร้อมส่ง</option>
+                            </select>
+                        </td>
+                        <td><button class="btn-update">บันทึก</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <!-- Script สำหรับดึงวันที่ปัจจุบันมาแสดงแบบ DD-MM-YYYY -->
+    <script>
+        const today = new Date();
+        const d = String(today.getDate()).padStart(2, '0');
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const y = today.getFullYear();
+        
+        document.getElementById('currentDate').innerText = `${d}-${m}-${y}`;
+    </script>
+
+</body>
+</html>
