@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ชำระเงินมัดจำ - ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</title>
+    <style>
+        :root {
+            --primary-color: #5c4033;
+            --accent-color: #f7e7ce;  
+            --text-color: #333;
+            --bg-color: #fafafa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .navbar-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .main-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .payment-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-box {
+            background-color: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .bank-details {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            background-color: #fff9f0;
+        }
+
+        .bank-details p {
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #4a3329;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-logo">ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</a>
+        <div class="navbar-links">
+            <span id="loggedInUser" style="align-self: center; font-weight: 500; color: var(--primary-color);"></span>
+            <a href="order.html">สั่งขนม</a>
+            <a href="status.html">เช็คสถานะออเดอร์</a>
+            <a href="index.html">ออกจากระบบ</a>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <div class="payment-card">
+            <h1>ชำระเงินมัดจำ</h1>
+            <p>กรุณาโอนเงินเพื่อยืนยันคำสั่งซื้อของคุณ</p>
+
+            <div class="summary-box" id="summaryBox">
+                <strong>รหัสคำสั่งซื้อ:</strong> <span id="summaryOrderID">-</span><br>
+                <strong>ยอดรวมทั้งหมด:</strong> <span id="summaryTotal">-</span> บาท<br>
+                <strong>ยอดมัดจำที่ต้องชำระ (50%):</strong> <span style="color: var(--primary-color); font-weight: bold;" id="summaryDeposit">-</span> บาท<br>
+                <strong>ยอดที่เหลือชำระตอนรับสินค้า:</strong> <span id="summaryRemaining">-</span> บาท
+            </div>
+
+            <div class="bank-details">
+                <strong>ธนาคารกสิกรไทย (KBANK)</strong>
+                <p>เลขที่บัญชี: 123-4-56789-0</p>
+                <p>ชื่อบัญชี: ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</p>
+            </div>
+
+            <!-- เมื่อแนบสลิปเสร็จ จะเด้งไปหน้า status.html -->
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label for="slip_image">แนบหลักฐานการโอนเงิน (สลิป):</label>
+                    <input type="file" id="slip_image" name="slip_image" accept="image/*" required>
+                </div>
+
+                <button type="submit" class="submit-btn">ยืนยันการชำระเงิน</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const savedUser = localStorage.getItem('username');
+        if (savedUser) {
+            document.getElementById('loggedInUser').innerText = `👤 ${savedUser}`;
+        }
+
+        const orderId = localStorage.getItem('pending_order_id') || '1';
+        const totalAmount = parseFloat(localStorage.getItem('pending_total') || '0');
+        const depositAmount = parseFloat(localStorage.getItem('pending_deposit') || '0');
+        const remainingAmount = totalAmount - depositAmount;
+
+        document.getElementById('summaryOrderID').innerText = `#ORD-${String(orderId).padStart(4, '0')}`;
+        document.getElementById('summaryTotal').innerText = totalAmount;
+        document.getElementById('summaryDeposit').innerText = depositAmount;
+        document.getElementById('summaryRemaining').innerText = remainingAmount;
+
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('slip_image');
+            if (fileInput.files.length === 0) {
+                alert('กรุณาแนบสลิปการโอนเงิน');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('order_id', orderId);
+            formData.append('amount', depositAmount);
+            formData.append('payment_type', 'QR Transfer');
+            formData.append('slip_image', fileInput.files[0]);
+
+            try {
+                const response = await fetch('http://localhost:8080/api/payment', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('แจ้งชำระเงินสำเร็จ! สถานะออเดอร์เปลี่ยนเป็น "รอตรวจสอบ"');
+                    window.location.href = 'status.html';
+                } else {
+                    alert('เกิดข้อผิดพลาดในการบันทึกการชำระเงิน');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+            }
+        });
+    </script>
+</body>
+</html>

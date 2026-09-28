@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สถานะออเดอร์ - ร้านเบเกอรี่เบลอๆ</title>
+    <title>สถานะออเดอร์ - ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</title>
     <style>
         :root {
             --primary-color: #5c4033;
@@ -135,8 +135,9 @@
 <body>
 
     <nav class="navbar">
-        <a href="index.html" class="navbar-logo">ร้านเบเกอรี่เบลอๆ</a>
+        <a href="index.html" class="navbar-logo">ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</a>
         <div class="navbar-links">
+            <span id="loggedInUser" style="align-self: center; font-weight: 500; color: var(--primary-color);"></span>
             <a href="order.html">สั่งขนม</a>
             <a href="status.html">เช็คสถานะออเดอร์</a>
             <a href="index.html">ออกจากระบบ</a>
@@ -152,44 +153,65 @@
                     <tr>
                         <th>รหัสออเดอร์</th>
                         <th>วันที่รับสินค้า</th>
-                        <th>รายการ (จำนวนรวม)</th>
+                        <th>รายการขนม</th>
                         <th>ยอดรวม (บาท)</th>
                         <th>สถานะ</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="customerOrderTableBody">
                     <tr>
-                        <td>#ORD-0004</td>
-                        <td>03-10-2026</td>
-                        <td>ขนมปังโชกุปัง (2)</td>
-                        <td>240</td>
-                        <td><span class="badge badge-wait-prod">รอผลิต</span></td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-0003</td>
-                        <td>02-10-2026</td>
-                        <td>บลูเบอร์รี่ชีสเค้ก (3), ครัวซองต์ (2)</td>
-                        <td>385</td>
-                        <td><span class="badge badge-in-prod">กำลังผลิต</span></td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-0002</td>
-                        <td>01-10-2026</td>
-                        <td>ช็อกโกแลตลาวาเค้ก (1)</td>
-                        <td>90</td>
-                        <td><span class="badge badge-wait-inspect">รอตรวจสอบ</span></td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-0001</td>
-                        <td>28-09-2026</td>
-                        <td>ครัวซองต์เนยสด (5)</td>
-                        <td>325</td>
-                        <td><span class="badge badge-ready">พร้อมส่ง</span></td>
+                        <td colspan="5" style="text-align: center;">กำลังโหลดข้อมูลคำสั่งซื้อ...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
+
+    <script>
+        const savedUser = localStorage.getItem('username');
+        if (savedUser) {
+            document.getElementById('loggedInUser').innerText = `👤 ${savedUser}`;
+        }
+
+        async function loadCustomerOrders() {
+            const customerId = localStorage.getItem('customer_id') || '1';
+            try {
+                const res = await fetch(`http://localhost:8080/api/customer/orders?customer_id=${customerId}`);
+                const orders = await res.json();
+
+                const tbody = document.getElementById('customerOrderTableBody');
+                tbody.innerHTML = '';
+
+                if (!orders || orders.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #666;">ยังไม่มีประวัติการสั่งซื้อสินค้า</td></tr>`;
+                    return;
+                }
+
+                orders.forEach(o => {
+                    let badgeClass = 'badge-wait-prod';
+                    if (o.status === 'รอตรวจสอบ') badgeClass = 'badge-wait-inspect';
+                    else if (o.status === 'กำลังผลิต') badgeClass = 'badge-in-prod';
+                    else if (o.status === 'พร้อมส่ง') badgeClass = 'badge-ready';
+                    else if (o.status === 'รอผลิต') badgeClass = 'badge-wait-prod';
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#ORD-${String(o.order_id).padStart(4, '0')}</td>
+                        <td>${o.received_date}</td>
+                        <td>${o.items_summary}</td>
+                        <td>${o.total_amount}</td>
+                        <td><span class="badge ${badgeClass}">${o.status}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+                document.getElementById('customerOrderTableBody').innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์เพื่อโหลดข้อมูลได้</td></tr>`;
+            }
+        }
+
+        loadCustomerOrders();
+    </script>
 
 </body>
 </html>

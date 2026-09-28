@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สมัครสมาชิก - ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</title>
+    <title>สมัครสมาชิก - ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</title>
     <style>
         :root {
             --primary-color: #5c4033;
@@ -112,10 +112,10 @@
 
     <div class="auth-container">
         <h1>สมัครสมาชิกใหม่</h1>
-        <p class="subtitle">เข้าร่วมเป็นส่วนหนึ่งของร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</p>
+        <p class="subtitle">เข้าร่วมเป็นส่วนหนึ่งของร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</p>
 
         <!-- ฟอร์มสมัครสมาชิก -->
-        <form action="#" method="POST">
+        <form id="registerForm">
             <div class="form-group">
                 <label for="fullname">ชื่อ-นามสกุล</label>
                 <input type="text" id="fullname" name="fullname" placeholder="กรอกชื่อ-นามสกุล" required>
@@ -124,6 +124,11 @@
             <div class="form-group">
                 <label for="phone">เบอร์โทรศัพท์</label>
                 <input type="tel" id="phone" name="phone" placeholder="0xx-xxxxxxx" pattern="[0-9]{3}-[0-9]{7}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">อีเมล (Email)</label>
+                <input type="email" id="email" name="email" placeholder="example@email.com" required>
             </div>
 
             <div class="form-group">
@@ -143,6 +148,41 @@
 
             <button type="submit" class="submit-btn">ยืนยันการสมัคร</button>
         </form>
+
+        <script>
+            document.getElementById('registerForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const fullname = document.getElementById('fullname').value;
+                const phone = document.getElementById('phone').value;
+                const email = document.getElementById('email').value;
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm_password').value;
+
+                if (password !== confirmPassword) {
+                    alert('รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://localhost:8080/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fullname, phone, email, username, password })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert('สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ');
+                        window.location.href = 'login.html';
+                    } else {
+                        alert('เกิดข้อผิดพลาด: ' + (result.error || 'ไม่สามารถสมัครสมาชิกได้'));
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+                }
+            });
+        </script>
 
         <!-- ลิงก์กลับไปหน้าเข้าสู่ระบบ -->
         <a href="login.html" class="toggle-link">มีบัญชีอยู่แล้วใช่ไหม? <span>เข้าสู่ระบบที่นี่</span></a>

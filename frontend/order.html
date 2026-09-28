@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สั่งพรีออเดอร์ - ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</title>
+    <title>สั่งพรีออเดอร์ - ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</title>
     <style>
         :root {
             --primary-color: #5c4033;
@@ -176,56 +176,105 @@
 <body>
 
     <nav class="navbar">
-        <a href="index.html" class="navbar-logo">ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</a>
+        <a href="index.html" class="navbar-logo">ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</a>
         <div class="navbar-links">
+            <span id="loggedInUser" style="align-self: center; font-weight: 500; color: var(--primary-color);"></span>
             <a href="order.html">สั่งขนม</a>
             <a href="status.html">เช็คสถานะออเดอร์</a>
-            <a href="login.html">ออกจากระบบ</a>
+            <a href="index.html">ออกจากระบบ</a>
         </div>
     </nav>
 
     <main class="main-container">
         <h1>พรีออเดอร์ขนมล่วงหน้า</h1>
 
-        <form class="order-form" action="status.html">
+        <form class="order-form" id="orderForm">
             <div class="form-group">
                 <label for="receiveDate">วันที่ต้องการรับสินค้า:</label>
                 <input type="text" id="receiveDate" name="receiveDate" placeholder="คลิกเพื่อเลือกวันที่" required>
             </div>
 
             <div class="menu-list">
-                <div class="menu-title">รายการสินค้าและราคา</div>
+                <div class="menu-title">รายการขนมไทยและราคา</div>
                 
                 <div class="menu-item">
                     <div class="menu-info">
-                        <span class="menu-name">บลูเบอร์รี่ชีสเค้ก</span>
-                        <span class="menu-price">ราคา 85 บาท/ชิ้น</span>
+                        <span class="menu-name">ทองหยิบ</span>
+                        <span class="menu-price">ราคา 50 บาท/กล่อง</span>
                     </div>
-                    <input type="number" id="qty_blueberry" name="qty_blueberry" min="0" value="0" required>
+                    <input type="number" id="qty_thongyip" name="qty_thongyip" min="0" value="0" required>
                 </div>
                 
                 <div class="menu-item">
                     <div class="menu-info">
-                        <span class="menu-name">ครัวซองต์เนยสด</span>
-                        <span class="menu-price">ราคา 65 บาท/ชิ้น</span>
+                        <span class="menu-name">ทองหยอด</span>
+                        <span class="menu-price">ราคา 45 บาท/กล่อง</span>
                     </div>
-                    <input type="number" id="qty_croissant" name="qty_croissant" min="0" value="0" required>
+                    <input type="number" id="qty_thongyod" name="qty_thongyod" min="0" value="0" required>
                 </div>
                 
                 <div class="menu-item">
                     <div class="menu-info">
-                        <span class="menu-name">ช็อกโกแลตลาวาเค้ก</span>
-                        <span class="menu-price">ราคา 90 บาท/ชิ้น</span>
+                        <span class="menu-name">ฝอยทอง</span>
+                        <span class="menu-price">ราคา 60 บาท/กล่อง</span>
                     </div>
-                    <input type="number" id="qty_lava" name="qty_lava" min="0" value="0" required>
+                    <input type="number" id="qty_foithong" name="qty_foithong" min="0" value="0" required>
                 </div>
                 
                 <div class="menu-item">
                     <div class="menu-info">
-                        <span class="menu-name">ขนมปังโชกุปัง</span>
-                        <span class="menu-price">ราคา 120 บาท/ชิ้น</span>
+                        <span class="menu-name">เม็ดขนุน</span>
+                        <span class="menu-price">ราคา 45 บาท/กล่อง</span>
                     </div>
-                    <input type="number" id="qty_shokupan" name="qty_shokupan" min="0" value="0" required>
+                    <input type="number" id="qty_medkanun" name="qty_medkanun" min="0" value="0" required>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">ขนมชั้น</span>
+                        <span class="menu-price">ราคา 55 บาท/กล่อง</span>
+                    </div>
+                    <input type="number" id="qty_khanomchan" name="qty_khanomchan" min="0" value="0" required>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">บัวลอยเผือกไข่หวาน</span>
+                        <span class="menu-price">ราคา 50 บาท/ถ้วย</span>
+                    </div>
+                    <input type="number" id="qty_bualoy" name="qty_bualoy" min="0" value="0" required>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">ขนมเปียกปูนกะทิสด</span>
+                        <span class="menu-price">ราคา 45 บาท/กล่อง</span>
+                    </div>
+                    <input type="number" id="qty_piakpoon" name="qty_piakpoon" min="0" value="0" required>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">ขนมหม้อแกงเผือก</span>
+                        <span class="menu-price">ราคา 70 บาท/ถาด</span>
+                    </div>
+                    <input type="number" id="qty_morkang" name="qty_morkang" min="0" value="0" required>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">ตะโก้แห้วเผือก</span>
+                        <span class="menu-price">ราคา 50 บาท/กล่อง</span>
+                    </div>
+                    <input type="number" id="qty_tako" name="qty_tako" min="0" value="0" required>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-info">
+                        <span class="menu-name">สังขยาฟักทอง</span>
+                        <span class="menu-price">ราคา 80 บาท/ชิ้น</span>
+                    </div>
+                    <input type="number" id="qty_sangkayafaktong" name="qty_sangkayafaktong" min="0" value="0" required>
                 </div>
             </div>
 
@@ -235,9 +284,90 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         flatpickr("#receiveDate", {
-            dateFormat: "d-m-Y", // บังคับฟอร์แมตเป็น DD-MM-YYYY
-            minDate: new Date().fp_incr(1), // บังคับเลือกได้เฉพาะวันพรุ่งนี้เป็นต้นไป (ล่วงหน้า 1 วัน)
-            maxDate: new Date().fp_incr(7), // บังคับเลือกได้สูงสุดไม่เกิน 7 วัน
+            dateFormat: "d-m-Y",
+            minDate: new Date().fp_incr(1),
+            maxDate: new Date().fp_incr(7),
+        });
+
+        const savedUser = localStorage.getItem('username');
+        if (savedUser) {
+            document.getElementById('loggedInUser').innerText = `👤 ${savedUser}`;
+        }
+
+        const productPrices = {
+            'qty_thongyip': { id: 1, price: 50 },
+            'qty_thongyod': { id: 2, price: 45 },
+            'qty_foithong': { id: 3, price: 60 },
+            'qty_medkanun': { id: 4, price: 45 },
+            'qty_khanomchan': { id: 5, price: 55 },
+            'qty_bualoy': { id: 6, price: 50 },
+            'qty_piakpoon': { id: 7, price: 45 },
+            'qty_morkang': { id: 8, price: 70 },
+            'qty_tako': { id: 9, price: 50 },
+            'qty_sangkayafaktong': { id: 10, price: 80 }
+        };
+
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const receiveDate = document.getElementById('receiveDate').value;
+            if (!receiveDate) {
+                alert('กรุณาเลือกวันที่ต้องการรับสินค้า');
+                return;
+            }
+
+            const items = [];
+            let totalAmount = 0;
+
+            for (const [elementId, info] of Object.entries(productPrices)) {
+                const qty = parseInt(document.getElementById(elementId).value) || 0;
+                if (qty > 0) {
+                    const subTotal = qty * info.price;
+                    items.push({
+                        product_id: info.id,
+                        quantity: qty,
+                        sub_total: subTotal
+                    });
+                    totalAmount += subTotal;
+                }
+            }
+
+            if (items.length === 0) {
+                alert('กรุณาเลือกสินค้าอย่างน้อย 1 รายการ');
+                return;
+            }
+
+            const depositAmount = totalAmount * 0.5;
+            const customerId = parseInt(localStorage.getItem('customer_id') || '1');
+
+            try {
+                const response = await fetch('http://localhost:8080/api/order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customer_id: customerId,
+                        employee_id: 0,
+                        received_date: receiveDate,
+                        total_amount: totalAmount,
+                        deposit_amount: depositAmount,
+                        items: items
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    localStorage.setItem('pending_order_id', result.order_id);
+                    localStorage.setItem('pending_total', totalAmount);
+                    localStorage.setItem('pending_deposit', depositAmount);
+                    localStorage.setItem('pending_received_date', receiveDate);
+                    alert('สั่งซื้อสำเร็จ! กำลังพาไปหน้าชำระเงินมัดจำ');
+                    window.location.href = 'payment.html';
+                } else {
+                    alert('ไม่สามารถสั่งซื้อได้: ' + (result.error || 'โควต้าเต็มหรือเกิดข้อผิดพลาด'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+            }
         });
     </script>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการออเดอร์ (Admin) - ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</title>
+    <title>จัดการออเดอร์ (Admin) - ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</title>
     <style>
         :root {
             --primary-color: #5c4033;
@@ -146,7 +146,7 @@
 <body>
 
     <nav class="navbar">
-        <a href="#" class="navbar-logo">Bakery Admin Panel</a>
+        <a href="#" class="navbar-logo">Admin - ร้านขนมไทย</a>
         <div class="navbar-links">
             <a href="#">แดชบอร์ด</a>
             <a href="index.html">ออกจากระบบ</a>
@@ -159,15 +159,15 @@
         <div class="dashboard-summary">
             <div class="summary-card">
                 <div class="summary-title">ออเดอร์ทั้งหมดวันนี้</div>
-                <div class="summary-value">4 รายการ</div>
+                <div class="summary-value" id="totalOrdersCount">0 รายการ</div>
             </div>
             <div class="summary-card" style="border-left-color: #e67e22;">
-                <div class="summary-title">ยอดรวมขนมที่สั่ง (โควต้า 999 ชิ้น)</div>
-                <div class="summary-value">13 / 999 ชิ้น</div>
+                <div class="summary-title">โควต้ารวม (จำกัด 999 ชิ้น)</div>
+                <div class="summary-value">ระบบเปิดใช้งาน</div>
             </div>
             <div class="summary-card" style="border-left-color: #27ae60;">
-                <div class="summary-title">รายได้ประเมิน</div>
-                <div class="summary-value">1,040 บาท</div>
+                <div class="summary-title">รายได้รวม</div>
+                <div class="summary-value" id="totalRevenueCount">0 บาท</div>
             </div>
         </div>
 
@@ -178,45 +178,20 @@
                     <tr>
                         <th>รหัสออเดอร์</th>
                         <th>ชื่อลูกค้า</th>
-                        <th>รายการขนม</th>
-                        <th>อัปเดตสถานะล่าสุด</th>
+                        <th>ข้อมูลออเดอร์</th>
+                        <th>สถานะออเดอร์</th>
                         <th>จัดการ</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="adminOrderTableBody">
                     <tr>
-                        <td>#ORD-0004</td>
-                        <td>คุณสมชาย</td>
-                        <td>โชกุปัง (2)</td>
-                        <td>
-                            <select class="status-dropdown">
-                                <option value="wait-prod" selected>รอผลิต</option>
-                                <option value="in-prod">กำลังผลิต</option>
-                                <option value="wait-inspect">รอตรวจสอบ</option>
-                                <option value="ready">พร้อมส่ง</option>
-                            </select>
-                        </td>
-                        <td><button class="btn-update">บันทึก</button></td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-0003</td>
-                        <td>คุณสมหญิง</td>
-                        <td>ชีสเค้ก (3), ครัวซองต์ (2)</td>
-                        <td>
-                            <select class="status-dropdown">
-                                <option value="wait-prod">รอผลิต</option>
-                                <option value="in-prod" selected>กำลังผลิต</option>
-                                <option value="wait-inspect">รอตรวจสอบ</option>
-                                <option value="ready">พร้อมส่ง</option>
-                            </select>
-                        </td>
-                        <td><button class="btn-update">บันทึก</button></td>
+                        <td colspan="5" style="text-align: center;">กำลังโหลดข้อมูล...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
-    <!-- Script สำหรับดึงวันที่ปัจจุบันมาแสดงแบบ DD-MM-YYYY -->
+    <!-- Script สำหรับดึงวันที่ปัจจุบันและโหลดข้อมูลออเดอร์จาก API -->
     <script>
         const today = new Date();
         const d = String(today.getDate()).padStart(2, '0');
@@ -224,6 +199,75 @@
         const y = today.getFullYear();
         
         document.getElementById('currentDate').innerText = `${d}-${m}-${y}`;
+
+        async function loadAdminOrders() {
+            try {
+                const res = await fetch('http://localhost:8080/api/admin/orders');
+                const orders = await res.json();
+                
+                const tbody = document.getElementById('adminOrderTableBody');
+                tbody.innerHTML = '';
+
+                let totalOrders = orders ? orders.length : 0;
+                let totalRevenue = 0;
+
+                if (!orders || orders.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #666;">ยังไม่มีรายการออเดอร์ในระบบ</td></tr>`;
+                    return;
+                }
+
+                orders.forEach(o => {
+                    totalRevenue += o.total_amount;
+                    const tr = document.createElement('tr');
+                    
+                    const statuses = ['รอตรวจสอบ', 'รอผลิต', 'กำลังผลิต', 'พร้อมส่ง'];
+                    let optionsHtml = statuses.map(st => `<option value="${st}" ${o.status === st ? 'selected' : ''}>${st}</option>`).join('');
+
+                    tr.innerHTML = `
+                        <td>#ORD-${String(o.order_id).padStart(4, '0')}</td>
+                        <td>${o.customer_name}</td>
+                        <td>รับสินค้า: ${o.received_date} | ยอด: ${o.total_amount} ฿</td>
+                        <td>
+                            <select class="status-dropdown" id="status_${o.order_id}">
+                                ${optionsHtml}
+                            </select>
+                        </td>
+                        <td><button class="btn-update" onclick="updateOrderStatus(${o.order_id})">บันทึก</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('totalOrdersCount').innerText = `${totalOrders} รายการ`;
+                document.getElementById('totalRevenueCount').innerText = `${totalRevenue.toLocaleString()} บาท`;
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function updateOrderStatus(orderId) {
+            const statusSelect = document.getElementById(`status_${orderId}`);
+            const newStatus = statusSelect.value;
+
+            try {
+                const res = await fetch('http://localhost:8080/api/admin/update-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId, status: newStatus })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert('อัปเดตสถานะสำเร็จ');
+                    loadAdminOrders();
+                } else {
+                    alert('อัปเดตสถานะไม่สำเร็จ');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+            }
+        }
+
+        loadAdminOrders();
     </script>
 
 </body>

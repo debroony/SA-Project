@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</title>
+    <title>Admin Login - ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</title>
     <style>
         :root {
             --primary-color: #5c4033; /* สีน้ำตาลช็อกโกแลต */
@@ -116,7 +116,7 @@
         <p class="subtitle">ระบบหลังบ้าน (Back-office)</p>
 
         <!-- ฟอร์มเข้าสู่ระบบของ Admin -->
-        <form action="#" method="POST">
+        <form id="adminLoginForm">
             <div class="form-group">
                 <label for="admin_username">รหัสผู้ดูแลระบบ (Admin ID)</label>
                 <input type="text" id="admin_username" name="admin_username" placeholder="กรอกรหัสผู้ดูแลระบบ" required>
@@ -129,6 +129,34 @@
 
             <button type="submit" class="submit-btn">เข้าสู่ระบบหลังบ้าน</button>
         </form>
+
+        <script>
+            document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const username = document.getElementById('admin_username').value;
+                const password = document.getElementById('admin_password').value;
+
+                try {
+                    const response = await fetch('http://localhost:8080/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const result = await response.json();
+                    if (result.success && result.role === 'admin') {
+                        localStorage.setItem('admin_id', result.id);
+                        localStorage.setItem('username', username);
+                        localStorage.setItem('role', 'admin');
+                        window.location.href = 'admin_dashboard.html';
+                    } else {
+                        alert('เข้าสู่ระบบแอดมินไม่สำเร็จ: บัญชีผู้ใช้ไม่ถูกต้องหรือไม่มีสิทธิ์แอดมิน');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+                }
+            });
+        </script>
 
         <!-- ลิงก์กลับไปหน้าหลัก -->
         <a href="index.html" class="back-link">&larr; กลับไปหน้าร้านค้าปกติ</a>

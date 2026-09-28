@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เข้าสู่ระบบ - ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</title>
+    <title>เข้าสู่ระบบ - ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</title>
     <style>
         :root {
             --primary-color: #5c4033; /* สีน้ำตาลช็อกโกแลต */
@@ -112,10 +112,10 @@
 
     <div class="auth-container">
         <h1>เข้าสู่ระบบ</h1>
-        <p class="subtitle">ยินดีต้อนรับกลับสู่ร้านเบเกอรี่ by น้องเอี่ยมอ่อง ThaiPBS</p>
+        <p class="subtitle">ยินดีต้อนรับกลับสู่ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</p>
 
         <!-- ฟอร์มเข้าสู่ระบบ -->
-        <form action="#" method="POST">
+        <form id="loginForm">
             <div class="form-group">
                 <label for="username">ชื่อผู้ใช้งาน หรือ อีเมล</label>
                 <input type="text" id="username" name="username" placeholder="กรอกชื่อผู้ใช้งาน" required>
@@ -128,6 +128,39 @@
 
             <button type="submit" class="submit-btn">เข้าสู่ระบบ</button>
         </form>
+
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch('http://localhost:8080/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        localStorage.setItem('customer_id', result.id);
+                        localStorage.setItem('username', result.username || username);
+                        localStorage.setItem('role', result.role);
+
+                        if (result.role === 'admin') {
+                            window.location.href = 'admin_dashboard.html';
+                        } else {
+                            window.location.href = 'order.html';
+                        }
+                    } else {
+                        alert('เข้าสู่ระบบไม่สำเร็จ: ' + (result.error || 'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง'));
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+                }
+            });
+        </script>
 
         <!-- ลิงก์ไปหน้าสมัครสมาชิก -->
         <a href="register.html" class="toggle-link">ยังไม่มีบัญชีใช่ไหม? <span>สมัครสมาชิกที่นี่</span></a>
