@@ -141,6 +141,40 @@
         .btn-update:hover {
             background-color: #241813;
         }
+
+        .btn-action {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-action:hover {
+            background-color: #3e2a22;
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .navbar, .btn-update, button, #reportDatePicker, label, .status-dropdown, .dashboard-summary {
+                display: none !important;
+            }
+            .main-container {
+                max-width: 100%;
+                margin: 0;
+                padding: 1cm;
+            }
+            .table-container, .summary-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
     </style>
 </head>
 <body>
@@ -172,7 +206,7 @@
         </div>
 
         <h2>รายการสั่งพรีออเดอร์ลูกค้า</h2>
-        <div class="table-container">
+        <div class="table-container" style="margin-bottom: 2.5rem;">
             <table>
                 <thead>
                     <tr>
@@ -190,15 +224,92 @@
                 </tbody>
             </table>
         </div>
+
+        <h2>แผนการผลิตประจำวัน (Production Batch Planning)</h2>
+        <div class="table-container" style="margin-bottom: 2.5rem;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>วันที่รับสินค้า (Target Date)</th>
+                        <th>ชื่อขนม (Product)</th>
+                        <th>จำนวนที่ต้องผลิต (Total Qty)</th>
+                        <th>สถานะคิวการผลิต</th>
+                    </tr>
+                </thead>
+                <tbody id="productionPlanTableBody">
+                    <tr>
+                        <td colspan="4" style="text-align: center;">กำลังโหลดข้อมูลแผนการผลิต...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>จัดการวัตถุดิบและแจ้งเตือนการจัดซื้อ (Inventory & Purchasing)</h2>
+        <div class="table-container" style="margin-bottom: 2.5rem;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>รหัสวัตถุดิบ</th>
+                        <th>ชื่อวัตถุดิบ</th>
+                        <th>ปริมาณคงเหลือ (StockQty)</th>
+                        <th>สถานะการจัดซื้อ</th>
+                    </tr>
+                </thead>
+                <tbody id="ingredientTableBody">
+                    <tr>
+                        <td colspan="4" style="text-align: center;">กำลังโหลดข้อมูลวัตถุดิบ...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- รายงานสรุปยอดขายประจำวันและปิดยอด -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; margin-bottom: 1rem;">
+            <h2>รายงานสรุปยอดขายประจำวันและการปิดยอด (Daily Sales Report)</h2>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="date" id="reportDatePicker" style="padding: 0.4rem; border: 1px solid #ccc; border-radius: 5px;">
+                <button class="btn-action" onclick="loadDailyReport()">ดูรายงาน</button>
+                <button class="btn-action" style="background-color: #27ae60;" onclick="printReport()">🖨️ พิมพ์รายงานปิดยอด</button>
+                <button class="btn-action" style="background-color: #2980b9;" onclick="exportCSV()">📥 ส่งออก CSV</button>
+            </div>
+        </div>
+
+        <div class="table-container" id="printableReportSection">
+            <div id="reportHeader" style="margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--primary-color);">รายงานสรุปยอดขายประจำวัน - ร้านขนมไทย by น้องเอี่ยมอ่อง Thai PBS</h3>
+                <p style="margin: 0.3rem 0; color: #666;" id="reportDateText">ประจำวันที่: -</p>
+                <p style="margin: 0.3rem 0; font-weight: bold;" id="reportSummaryStats">จำนวนออเดอร์: 0 รายการ | ยอดขายรวม: 0.00 บาท</p>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>รหัสสินค้า</th>
+                        <th>ชื่อขนมไทย</th>
+                        <th>จำนวนที่จำหน่าย (กล่อง/ชิ้น)</th>
+                        <th>ยอดขายรวม (บาท)</th>
+                    </tr>
+                </thead>
+                <tbody id="dailyReportTableBody">
+                    <tr>
+                        <td colspan="4" style="text-align: center;">กำลังโหลดรายงานสรุปยอดขาย...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </main>
+
     <!-- Script สำหรับดึงวันที่ปัจจุบันและโหลดข้อมูลออเดอร์จาก API -->
     <script>
         const today = new Date();
         const d = String(today.getDate()).padStart(2, '0');
         const m = String(today.getMonth() + 1).padStart(2, '0');
         const y = today.getFullYear();
+        const todayStr = `${y}-${m}-${d}`;
         
         document.getElementById('currentDate').innerText = `${d}-${m}-${y}`;
+        document.getElementById('reportDatePicker').value = todayStr;
+
+        let currentReportData = null;
 
         async function loadAdminOrders() {
             try {
@@ -220,7 +331,7 @@
                     totalRevenue += o.total_amount;
                     const tr = document.createElement('tr');
                     
-                    const statuses = ['รอตรวจสอบ', 'รอผลิต', 'กำลังผลิต', 'พร้อมส่ง'];
+                    const statuses = ['รอตรวจสอบ', 'รอผลิต', 'กำลังผลิต', 'พร้อมส่ง', 'สำเร็จ'];
                     let optionsHtml = statuses.map(st => `<option value="${st}" ${o.status === st ? 'selected' : ''}>${st}</option>`).join('');
 
                     tr.innerHTML = `
@@ -244,6 +355,129 @@
             }
         }
 
+        async function loadIngredients() {
+            try {
+                const res = await fetch('http://localhost:8080/api/admin/ingredients');
+                const ingredients = await res.json();
+                
+                const tbody = document.getElementById('ingredientTableBody');
+                tbody.innerHTML = '';
+
+                if (!ingredients || ingredients.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #666;">ไม่มีข้อมูลวัตถุดิบในระบบ</td></tr>`;
+                    return;
+                }
+
+                ingredients.forEach(ing => {
+                    const tr = document.createElement('tr');
+                    let statusHtml = `<span style="color: green; font-weight: bold;">✔ วัตถุดิบเพียงพอ</span>`;
+                    if (ing.needs_purchase) {
+                        statusHtml = `<span style="color: red; font-weight: bold; background: #ffe6e6; padding: 0.3rem 0.6rem; border-radius: 4px;">⚠️ ต้องจัดซื้อด่วน (Purchasing Alert)</span>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td>#ING-${String(ing.ingredient_id).padStart(3, '0')}</td>
+                        <td>${ing.ingredient_name}</td>
+                        <td>${ing.stock_qty.toLocaleString()}</td>
+                        <td>${statusHtml}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+                document.getElementById('ingredientTableBody').innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">ไม่สามารถโหลดข้อมูลวัตถุดิบได้</td></tr>`;
+            }
+        }
+
+        async function loadProductionPlan() {
+            try {
+                const res = await fetch('http://localhost:8080/api/admin/production-plan');
+                const plan = await res.json();
+                
+                const tbody = document.getElementById('productionPlanTableBody');
+                tbody.innerHTML = '';
+
+                if (!plan || plan.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #666;">ไม่มีรายการออเดอร์ในขั้นตอนการผลิต (รอผลิต / กำลังผลิต)</td></tr>`;
+                    return;
+                }
+
+                plan.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>📅 ${item.received_date}</td>
+                        <td>🍬 ${item.product_name}</td>
+                        <td><strong>${item.total_qty}</strong> กล่อง/ชิ้น</td>
+                        <td><span style="background: #e2d9f3; color: #5a32a3; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: bold;">📦 จัดเตรียมวัตถุดิบ & ผลิตตามรอบ</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+                document.getElementById('productionPlanTableBody').innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">ไม่สามารถโหลดข้อมูลแผนการผลิตได้</td></tr>`;
+            }
+        }
+
+        async function loadDailyReport() {
+            const dateVal = document.getElementById('reportDatePicker').value;
+            try {
+                const res = await fetch(`http://localhost:8080/api/admin/daily-report?date=${dateVal}`);
+                const report = await res.json();
+                currentReportData = report;
+
+                document.getElementById('reportDateText').innerText = `ประจำวันที่: ${report.report_date}`;
+                document.getElementById('reportSummaryStats').innerText = `จำนวนออเดอร์: ${report.total_orders} รายการ | ยอดขายรวม: ${report.total_revenue.toLocaleString()} บาท`;
+
+                const tbody = document.getElementById('dailyReportTableBody');
+                tbody.innerHTML = '';
+
+                if (!report.products || report.products.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #666;">ไม่มีรายการสั่งซื้อในวันที่เลือก</td></tr>`;
+                    return;
+                }
+
+                report.products.forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#PRD-${String(p.product_id).padStart(3, '0')}</td>
+                        <td><strong>${p.product_name}</strong></td>
+                        <td>${p.total_qty} กล่อง</td>
+                        <td>${p.total_sales.toLocaleString()} ฿</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+                document.getElementById('dailyReportTableBody').innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">ไม่สามารถโหลดรายงานสรุปยอดขายได้</td></tr>`;
+            }
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        function exportCSV() {
+            if (!currentReportData || !currentReportData.products || currentReportData.products.length === 0) {
+                alert('ไม่มีข้อมูลสำหรับส่งออก CSV');
+                return;
+            }
+
+            let csv = "รหัสสินค้า,ชื่อขนมไทย,จำนวนที่จำหน่าย,ยอดขายรวม(บาท)\n";
+            currentReportData.products.forEach(p => {
+                csv += `"${p.product_id}","${p.product_name}","${p.total_qty}","${p.total_sales}"\n`;
+            });
+            csv += `\nสรุปยอดขายรวม,${currentReportData.total_revenue},จำนวนออเดอร์,${currentReportData.total_orders}\n`;
+
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `daily_sales_report_${currentReportData.report_date}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         async function updateOrderStatus(orderId) {
             const statusSelect = document.getElementById(`status_${orderId}`);
             const newStatus = statusSelect.value;
@@ -258,6 +492,7 @@
                 if (result.success) {
                     alert('อัปเดตสถานะสำเร็จ');
                     loadAdminOrders();
+                    loadDailyReport();
                 } else {
                     alert('อัปเดตสถานะไม่สำเร็จ');
                 }
@@ -268,6 +503,9 @@
         }
 
         loadAdminOrders();
+        loadIngredients();
+        loadProductionPlan();
+        loadDailyReport();
     </script>
 
 </body>
