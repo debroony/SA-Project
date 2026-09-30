@@ -95,3 +95,25 @@ INSERT INTO PRODUCT (ProductID, ProductName, Price) VALUES
 INSERT INTO CUSTOMER (Username, Password, Title, Name, Surname, Phone, Email) VALUES
 ('somchai', '123456', 'นาย', 'สมชาย', 'ใจดี', '081-2345678', 'somchai@email.com');
 
+-- Seed Ingredients for Inventory & Purchasing System
+INSERT INTO INGREDIENT (IngredientID, IngredientName, StockQty) VALUES
+(1, 'แป้งข้าวเจ้า (g)', 3000.00),
+(2, 'น้ำตาลปี๊บ (g)', 2500.00),
+(3, 'กะทิสด (ml)', 4000.00),
+(4, 'ไข่ไก่ (ฟอง)', 250.00),
+(5, 'เผือกนึ่ง (g)', 1200.00),
+(6, 'ถั่วเขียวเลาะเปลือก (g)', 350.00); -- ต่ำกว่า 500 (Trigger Purchasing Alert)
+
+-- Seed Product-Ingredient Mapping
+INSERT INTO PRODUCT_INGREDIENT (ProductID, IngredientID) VALUES
+(1, 1), (1, 2), (1, 4),
+(2, 1), (2, 2), (2, 4),
+(3, 1), (3, 2), (3, 4),
+(4, 1), (4, 2), (4, 6),
+(5, 1), (5, 3),
+(6, 3), (6, 4), (6, 5),
+(7, 1), (7, 3),
+(8, 3), (8, 4), (8, 5),
+(9, 1), (9, 3), (9, 5),
+(10, 3), (10, 4), (10, 5);
+

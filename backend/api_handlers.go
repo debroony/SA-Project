@@ -289,13 +289,13 @@ func CustomerOrdersHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		query := `
-			SELECT o.OrderID, o.ReceivedDate, o.TotalAmount, o.Status,
+			SELECT o.OrderID, o.ReceivedDate, o.TotalAmount, o.DepositAmount, o.Status,
 			       COALESCE(GROUP_CONCAT(CONCAT(p.ProductName, ' (', op.Quantity, ')') SEPARATOR ', '), '-') AS items_summary
 			FROM ORDERS o
 			LEFT JOIN ORDER_PRODUCT op ON o.OrderID = op.OrderID
 			LEFT JOIN PRODUCT p ON op.ProductID = p.ProductID
 			WHERE o.CustomerID = ?
-			GROUP BY o.OrderID, o.ReceivedDate, o.TotalAmount, o.Status
+			GROUP BY o.OrderID, o.ReceivedDate, o.TotalAmount, o.DepositAmount, o.Status
 			ORDER BY o.OrderID DESC
 		`
 		rows, err := db.Query(query, customerID)
@@ -306,24 +306,101 @@ func CustomerOrdersHandler(db *sql.DB) http.HandlerFunc {
 		defer rows.Close()
 
 		type CustomerOrder struct {
-			OrderID      int     `json:"order_id"`
-			ReceivedDate string  `json:"received_date"`
-			TotalAmount  float64 `json:"total_amount"`
-			Status       string  `json:"status"`
-			ItemsSummary string  `json:"items_summary"`
+			OrderID       int     `json:"order_id"`
+			ReceivedDate  string  `json:"received_date"`
+			TotalAmount   float64 `json:"total_amount"`
+			DepositAmount float64 `json:"deposit_amount"`
+			Status        string  `json:"status"`
+			ItemsSummary  string  `json:"items_summary"`
 		}
 
 		var orders []CustomerOrder
 		for rows.Next() {
 			var o CustomerOrder
 			var recDate time.Time
-			if err := rows.Scan(&o.OrderID, &o.ReceivedDate, &o.TotalAmount, &o.Status, &o.ItemsSummary); err == nil {
+			if err := rows.Scan(&o.OrderID, &o.ReceivedDate, &o.TotalAmount, &o.DepositAmount, &o.Status, &o.ItemsSummary); err == nil {
 				o.ReceivedDate = recDate.Format("02-01-2006")
 				orders = append(orders, o)
 			}
 		}
 
 		json.NewEncoder(w).Encode(orders)
+	}
+}
+
+// BalancePaymentHandler handles balance payment (remaining 50%) and marks order as 'สำเร็จ'
+func BalancePaymentHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		if r.Method != "POST" {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			http.Error(w, "Failed to parse form", http.StatusBadRequest)
+			return
+		}
+
+		orderID := r.FormValue("order_id")
+		amount := r.FormValue("amount")
+		paymentType := r.FormValue("payment_type")
+
+		file, handler, err := r.FormFile("slip_image")
+		var slipFilename string
+		if err == nil {
+			defer file.Close()
+			os.MkdirAll("../frontend/uploads", os.ModePerm)
+			slipFilename = fmt.Sprintf("balance_%d_%s", time.Now().Unix(), handler.Filename)
+			dstPath := filepath.Join("../frontend/uploads", slipFilename)
+
+			dst, err := os.Create(dstPath)
+			if err != nil {
+				http.Error(w, "Failed to save slip image", http.StatusInternalServerError)
+				return
+			}
+			defer dst.Close()
+			io.Copy(dst, file)
+		}
+
+		tx, err := db.Begin()
+		if err != nil {
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+		defer tx.Rollback()
+
+		paymentQuery := `INSERT INTO PAYMENT (Amount, PaymentType, SlipImage, OrderID) VALUES (?, ?, ?, ?)`
+		_, err = tx.Exec(paymentQuery, amount, paymentType, slipFilename, orderID)
+		if err != nil {
+			http.Error(w, "Failed to insert payment", http.StatusInternalServerError)
+			return
+		}
+
+		updateOrderQuery := `UPDATE ORDERS SET Status = 'สำเร็จ' WHERE OrderID = ?`
+		_, err = tx.Exec(updateOrderQuery, orderID)
+		if err != nil {
+			http.Error(w, "Failed to update order status", http.StatusInternalServerError)
+			return
+		}
+
+		if err := tx.Commit(); err != nil {
+			http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": "ชำระเงินส่วนที่เหลือและปิดออเดอร์สำเร็จ",
+		})
 	}
 }
 
@@ -361,5 +438,149 @@ func AdminUpdateStatusHandler(db *sql.DB) http.HandlerFunc {
 			"success": true,
 			"message": "อัปเดตสถานะสำเร็จ",
 		})
+	}
+}
+
+// IngredientsHandler returns ingredient stock levels and purchasing alert status
+func IngredientsHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+
+		rows, err := db.Query("SELECT IngredientID, IngredientName, StockQty FROM INGREDIENT")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		type IngredientStock struct {
+			IngredientID   int     `json:"ingredient_id"`
+			IngredientName string  `json:"ingredient_name"`
+			StockQty       float64 `json:"stock_qty"`
+			NeedsPurchase  bool    `json:"needs_purchase"`
+		}
+
+		var ingredients []IngredientStock
+		for rows.Next() {
+			var ing IngredientStock
+			if err := rows.Scan(&ing.IngredientID, &ing.IngredientName, &ing.StockQty); err == nil {
+				ing.NeedsPurchase = ing.StockQty < 500.0
+				ingredients = append(ingredients, ing)
+			}
+		}
+
+		json.NewEncoder(w).Encode(ingredients)
+	}
+}
+
+// ProductionPlanHandler returns summarized product quantities grouped by ReceivedDate for production planning
+func ProductionPlanHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+
+		query := `
+			SELECT o.ReceivedDate, p.ProductName, SUM(op.Quantity) as total_qty
+			FROM ORDERS o
+			JOIN ORDER_PRODUCT op ON o.OrderID = op.OrderID
+			JOIN PRODUCT p ON op.ProductID = p.ProductID
+			WHERE o.Status IN ('รอผลิต', 'กำลังผลิต')
+			GROUP BY o.ReceivedDate, p.ProductName
+			ORDER BY o.ReceivedDate ASC, p.ProductName ASC
+		`
+		rows, err := db.Query(query)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		type ProductionItem struct {
+			ReceivedDate string `json:"received_date"`
+			ProductName  string `json:"product_name"`
+			TotalQty     int    `json:"total_qty"`
+		}
+
+		var plan []ProductionItem
+		for rows.Next() {
+			var item ProductionItem
+			var recDate time.Time
+			if err := rows.Scan(&recDate, &item.ProductName, &item.TotalQty); err == nil {
+				item.ReceivedDate = recDate.Format("02-01-2006")
+				plan = append(plan, item)
+			}
+		}
+
+		json.NewEncoder(w).Encode(plan)
+	}
+}
+
+// DailyReportHandler generates daily sales summary and breakdown by product
+func DailyReportHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+
+		dateStr := r.URL.Query().Get("date")
+		if dateStr == "" {
+			dateStr = time.Now().Format("2006-01-02")
+		} else {
+			dateStr = normalizeDate(dateStr)
+		}
+
+		type ProductSaleSummary struct {
+			ProductID   int     `json:"product_id"`
+			ProductName string  `json:"product_name"`
+			TotalQty    int     `json:"total_qty"`
+			TotalSales  float64 `json:"total_sales"`
+		}
+
+		type DailyReport struct {
+			ReportDate   string               `json:"report_date"`
+			TotalOrders  int                  `json:"total_orders"`
+			TotalRevenue float64              `json:"total_revenue"`
+			Products     []ProductSaleSummary `json:"products"`
+		}
+
+		report := DailyReport{
+			ReportDate: dateStr,
+			Products:   []ProductSaleSummary{},
+		}
+
+		// 1. Get total orders and total revenue for the day (based on OrderDate)
+		orderQuery := `
+			SELECT COUNT(OrderID), COALESCE(SUM(TotalAmount), 0)
+			FROM ORDERS
+			WHERE DATE(OrderDate) = DATE(?)
+		`
+		err := db.QueryRow(orderQuery, dateStr).Scan(&report.TotalOrders, &report.TotalRevenue)
+		if err != nil && err != sql.ErrNoRows {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// 2. Get breakdown by product for orders made on that day
+		productQuery := `
+			SELECT p.ProductID, p.ProductName, COALESCE(SUM(op.Quantity), 0) as total_qty, COALESCE(SUM(op.SubTotal), 0) as total_sales
+			FROM ORDER_PRODUCT op
+			JOIN ORDERS o ON op.OrderID = o.OrderID
+			JOIN PRODUCT p ON op.ProductID = p.ProductID
+			WHERE DATE(o.OrderDate) = DATE(?)
+			GROUP BY p.ProductID, p.ProductName
+			ORDER BY total_sales DESC
+		`
+		rows, err := db.Query(productQuery, dateStr)
+		if err == nil {
+			defer rows.Close()
+			for rows.Next() {
+				var ps ProductSaleSummary
+				if err := rows.Scan(&ps.ProductID, &ps.ProductName, &ps.TotalQty, &ps.TotalSales); err == nil {
+					report.Products = append(report.Products, ps)
+				}
+			}
+		}
+
+		json.NewEncoder(w).Encode(report)
 	}
 }

@@ -100,7 +100,7 @@ func CreateOrder(db *sql.DB, customerID int, employeeID int, receiveDate string,
 		return 0, fmt.Errorf("failed to get last insert ID: %v", err)
 	}
 
-	// 5. Insert each item into ORDER_PRODUCT
+	// 5. Insert each item into ORDER_PRODUCT and deduct ingredient stock
 	itemQuery := `
 		INSERT INTO ORDER_PRODUCT (OrderID, ProductID, Quantity, SubTotal)
 		VALUES (?, ?, ?, ?)
@@ -109,6 +109,24 @@ func CreateOrder(db *sql.DB, customerID int, employeeID int, receiveDate string,
 		_, err := tx.Exec(itemQuery, orderID, item.ProductID, item.Quantity, item.SubTotal)
 		if err != nil {
 			return 0, fmt.Errorf("failed to insert order product item: %v", err)
+		}
+
+		// Deduct ingredient stock automatically based on recipe
+		ingRows, err := tx.Query("SELECT IngredientID FROM PRODUCT_INGREDIENT WHERE ProductID = ?", item.ProductID)
+		if err == nil {
+			var ingIDs []int
+			for ingRows.Next() {
+				var ingID int
+				if err := ingRows.Scan(&ingID); err == nil {
+					ingIDs = append(ingIDs, ingID)
+				}
+			}
+			ingRows.Close()
+
+			deductAmount := float64(item.Quantity) * 15.0
+			for _, ingID := range ingIDs {
+				_, _ = tx.Exec("UPDATE INGREDIENT SET StockQty = GREATEST(0, StockQty - ?) WHERE IngredientID = ?", deductAmount, ingID)
+			}
 		}
 	}
 

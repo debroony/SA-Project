@@ -52,8 +52,12 @@ func main() {
 	http.HandleFunc("/api/register", RegisterHandler(db))
 	http.HandleFunc("/api/login", LoginHandler(db))
 	http.HandleFunc("/api/payment", PaymentHandler(db))
+	http.HandleFunc("/api/payment/balance", BalancePaymentHandler(db))
 	http.HandleFunc("/api/admin/orders", AdminOrdersHandler(db))
 	http.HandleFunc("/api/admin/update-status", AdminUpdateStatusHandler(db))
+	http.HandleFunc("/api/admin/ingredients", IngredientsHandler(db))
+	http.HandleFunc("/api/admin/production-plan", ProductionPlanHandler(db))
+	http.HandleFunc("/api/admin/daily-report", DailyReportHandler(db))
 	http.HandleFunc("/api/customer/orders", CustomerOrdersHandler(db))
 
 	// API Endpoint สำหรับสร้างออเดอร์ (/api/order)
